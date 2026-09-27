@@ -15,7 +15,7 @@ import {
 // Configure GoogleSignin once at app startup or component mount
 GoogleSignin.configure({
   webClientId:
-    '651133318286-oq2ph7kb7d4eub47kong3omdtadbre22.apps.googleusercontent.com',
+    '651133318286-0j2se07i7atc4aoelrus6dohvj6eou73.apps.googleusercontent.com',
 
   offlineAccess: true, // optionally needed for server-side verification
 });

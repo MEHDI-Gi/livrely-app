@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Text,
   View,
@@ -10,6 +10,7 @@ import {
   Linking,
   ActivityIndicator,
   StatusBar,
+  TextInput,
 } from 'react-native';
 import { DataContext } from '../context/contextData.tsx';
 import LinearGradient from 'react-native-linear-gradient';
@@ -26,7 +27,6 @@ import { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
 import { useColors } from '../hooks/useColors.ts';
 import { useVip } from '../hooks/useVip.ts';
 import { useUserAccuracy } from '../hooks/useUserAccuracy.ts';
-import PermitCategories from './layout/home/PermitCategories.tsx';
 const ShimmerPlaceHolder = createShimmerPlaceholder(LinearGradient);
 
 export default function Home() {
@@ -56,97 +56,50 @@ export default function Home() {
   const priorityCover = `${imgBase}/priority/L1/0.jpg`;
   const signsCover = `${imgBase}/cover/sgn.png`;
 
-  const splitUserAccu = String(userAccuracy || 0);
-  const [intPart, decPart = '0'] = splitUserAccu.split('.');
-
-  let totalSgn = 0;
-
-  (lessonsData?.content?.signs?.content || []).forEach(
-    (current: { items: any }) => {
-      totalSgn += Object.keys(current?.items || {}).length;
-    },
-  );
-
-  let totalPri = 0;
-  (lessonsData?.content?.priority?.content || []).forEach(
-    (current: { items: any }) => {
-      totalPri += Object.keys(current?.items || {}).length;
-    },
-  );
-
-  const totalQst = Object.keys(
-    lessonsData?.content?.questions?.content || {},
-  ).length;
-
-  const totalExm = Object.keys(examData?.content?.items || {}).length;
-
-  const contentItems = [
+  const [cheked, setCheked] = useState(1);
+  const vehiclesList = [
     {
-      cond: 'Exm',
-      label: 'إمتحان',
-      img: examsCover ?? null,
-      sub: '',
-      length: totalExm,
+      icon: 'motorcycle',
+      label: language === 'english' ? 'Moto' : 'أ',
+      src: 'FontAwesome5',
     },
     {
-      cond: 'Sgn',
-      label: 'إشارات',
-      img: signsCover ?? null,
-      sub: '',
-      length: totalSgn,
+      icon: 'car-side',
+      label: language === 'english' ? 'Car' : 'ب',
+      src: 'MaterialCommunityIcons',
     },
     {
-      cond: 'Qst',
-      label: 'أسئلة',
-      img: questCover ?? null,
-      sub: '',
-      length: totalQst,
+      icon: 'truck',
+      label: language === 'english' ? 'Truck' : '',
+      src: 'MaterialCommunityIcons',
     },
     {
-      cond: 'Pri',
-      label: 'أولوية',
-      img: priorityCover ?? null,
-      sub: '',
-      length: totalPri,
+      icon: 'bus',
+      label: language === 'english' ? 'Foot' : '',
+      src: 'FontAwesome5',
     },
   ];
 
-  const contentItemsPress = (item: any) => {
-    switch (item.cond) {
-      case 'Sgn':
-        navigation.navigate('MainTabs', {
-          screen: 'Lessons',
-          params: { screen: 'Signs', initial: false },
-        });
+  const vehiclesListPress = (item: any) => {
+    switch (item.label) {
+      case 'Moto':
+        setCheked(0);
         break;
-      case 'Pri':
-        navigation.navigate('MainTabs', {
-          screen: 'Lessons',
-          params: { screen: 'Priority', initial: false },
-        });
-
+      case 'Car':
+        setCheked(1);
         break;
-      case 'Qst':
-        navigation.navigate('MainTabs', {
-          screen: 'Lessons',
-          params: { screen: 'Questions', initial: false },
-        });
+      case 'Truck':
+        setCheked(2);
+        break;
+      case 'Foot':
+        setCheked(3);
         break;
       default:
         break;
     }
   };
-  const extSources = [
-    {
-      label:
-        'قانون المرور / اشارات المرور / تقاطعات الطرق و نظام الأولوية في الجزائر',
-      img: examsCover,
-      sub: '',
-    },
-    { label: '', img: examsCover ?? null, sub: '' },
-    { label: '', img: questCover ?? null, sub: '' },
-    { label: '', img: questCover ?? null, sub: '' },
-  ];
+
+  const [openModal, setOpenModal] = useState(false);
 
   return (
     <View
@@ -161,7 +114,6 @@ export default function Home() {
         },
       ]}
     >
-
       <View
         style={[
           {
@@ -260,36 +212,15 @@ export default function Home() {
                   justifyContent: 'center',
                 }}
               >
-                {!firebaseLoaded ? (
-                  <ShimmerPlaceHolder
-                    style={{ width: widthScale(60), height: heightScale(15) }}
-                    shimmerColors={[
-                      colors.secondary,
-                      '#6161617c',
-                      colors.secondary,
-                    ]}
-                  />
-                ) : userName ? (
-                  <Text
-                    style={{
-                      fontSize: sizeScale(16),
-                      fontWeight: '500',
-                      color: colors.text.primary,
-                    }}
-                  >
-                    {userName}
-                  </Text>
-                ) : (
-                  <Text
-                    style={{
-                      fontSize: sizeScale(16),
-                      fontWeight: '500',
-                      color: colors.text.primary,
-                    }}
-                  >
-                    user
-                  </Text>
-                )}
+                <Text
+                  style={{
+                    fontSize: sizeScale(16),
+                    fontWeight: '900',
+                    color: colors.text.primary,
+                  }}
+                >
+                  {userName}
+                </Text>
               </View>
               <View
                 style={{
@@ -366,546 +297,235 @@ export default function Home() {
           alignItems: 'center',
           justifyContent: 'flex-start',
           paddingTop: sizeScale(80),
-          paddingBottom: sizeScale(70),
           rowGap: sizeScale(10),
+          flex: 1,
         }}
         style={{
-          flex: 1,
           width: '100%',
         }}
       >
         <View
           style={{
             alignItems: 'center',
-            justifyContent: 'space-evenly',
-            backgroundColor: 'transparent',
-            flexDirection: 'row',
+            justifyContent: 'space-between',
+            flexDirection: 'column',
             width: '100%',
             flex: 1,
-            flexWrap: 'wrap',
             gap: sizeScale(10),
-          }}
-        >
-          {!firebaseLoaded ? (
-            <View
-              style={{
-                alignItems: 'center',
-                width: '90%',
-                height: heightScale(screen.width * 0.25),
-                borderRadius: 8,
-                flexDirection: 'row-reverse',
-                justifyContent: 'flex-start',
-                overflow: 'hidden',
-                gap: sizeScale(15),
-              }}
-            >
-              <ShimmerPlaceHolder
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: sizeScale(8),
-                }}
-                shimmerColors={[
-                  colors.secondary,
-                  '#6161617c',
-                  colors.secondary,
-                ]}
-              />
-              <View
-                style={{
-                  width: widthScale(screen.width * 0.22),
-                  height: heightScale(screen.width * 0.22),
-                  marginRight: sizeScale(10),
-                  borderRadius: sizeScale(8),
-                  backgroundColor: colors.primary,
-                }}
-              />
-              <View
-                style={{
-                  width: '100%',
-                  height: heightScale(screen.width * 0.22),
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  justifyContent: 'space-evenly',
-                }}
-              >
-                <View
-                  style={{
-                    backgroundColor: colors.primary,
-                    width: '50%',
-                    height: heightScale(30),
-                  }}
-                />
-                <View
-                  style={{
-                    backgroundColor: colors.primary,
-                    width: '30%',
-                    height: heightScale(20),
-                  }}
-                />
-                <View
-                  style={{
-                    backgroundColor: colors.primary,
-                    width: '60%',
-                    height: heightScale(10),
-                  }}
-                />
-              </View>
-            </View>
-          ) : (
-            <Pressable
-              android_ripple={{
-                borderless: false,
-                color: colors.secondary,
-                foreground: true,
-              }}
-              onPress={() =>
-                navigation.navigate('MainTabs', { screen: 'Exams' })
-              }
-              style={[
-                {
-                  alignItems: 'center',
-                  backgroundColor: colors.secondary,
-                  elevation: 3,
-                  width: '90%',
-                  height: heightScale(screen.width * 0.25),
-                  borderRadius: sizeScale(8),
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                },
-              ]}
-            >
-              <View
-                style={[
-                  {
-                    alignItems: 'flex-end',
-                    justifyContent: 'center',
-                    backgroundColor: 'transparent',
-                    width: '100%',
-                    height: '100%',
-                    paddingHorizontal: sizeScale(10),
-                    paddingVertical: sizeScale(10),
-                    flex: 1,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    fontFamily: 'Cairo-Bold',
-                    color: colors.text.primary,
-                    fontSize: sizeScale(16),
-                  }}
-                >
-                  {contentItems[0]?.label}
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Cairo',
-
-                    color: colors.text.secondary,
-                    fontSize: sizeScale(14),
-                  }}
-                >
-                  {contentItems[0]?.length} {contentItems[0]?.sub}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '100%',
-                  }}
-                >
-                  <View
-                    style={{
-                      width: '90%',
-                      height: heightScale(8),
-                      backgroundColor: colors.text.secondary,
-                      borderRadius: sizeScale(10),
-                      flexDirection: 'row-reverse',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '5%',
-                        height: '100%',
-                        backgroundColor: 'green',
-                        borderRadius: sizeScale(10),
-                        borderTopEndRadius: 0,
-                        borderBottomRightRadius: 0,
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-              <View
-                style={[
-                  {
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100%',
-                    width: widthScale(screen.width * 0.25),
-                    overflow: 'hidden',
-                    padding: 0,
-                    borderRadius: 0,
-                  },
-                ]}
-              >
-                {contentItems[0]?.img ? (
-                  <Image
-                    style={{
-                      width: '85%',
-                      height: '85%',
-                      borderRadius: sizeScale(8),
-                      resizeMode: 'cover',
-                    }}
-                    source={{ uri: contentItems[0]?.img }}
-                  />
-                ) : (
-                  <ShimmerPlaceHolder
-                    style={{ width: '100%', height: '100%' }}
-                    shimmerColors={[
-                      colors.secondary,
-                      '#6161617c',
-                      colors.secondary,
-                    ]}
-                  />
-                )}
-              </View>
-            </Pressable>
-          )}
-          {contentItems.map((item: any, index: number) => {
-            if (index === 0) return null;
-            if (!firebaseLoaded) {
-              return (
-                <View
-                  key={`shimmer-0-${item.cond}`}
-                  style={{
-                    alignItems: 'center',
-                    backgroundColor: 'transparent',
-                    width: '90%',
-                    height: heightScale(screen.width * 0.25),
-                    borderRadius: sizeScale(8),
-                    flexDirection: 'row-reverse',
-                    justifyContent: 'flex-start',
-                    overflow: 'hidden',
-                    padding: sizeScale(10),
-                    gap: sizeScale(15),
-                  }}
-                >
-                  <ShimmerPlaceHolder
-                    style={{
-                      width: widthScale(screen.width * 0.22),
-                      height: heightScale(screen.width * 0.22),
-                      borderRadius: sizeScale(8),
-                    }}
-                    shimmerColors={[
-                      colors.secondary,
-                      '#6161617c',
-                      colors.secondary,
-                    ]}
-                  />
-                  <View
-                    style={{
-                      width: '100%',
-                      height: heightScale(screen.width * 0.22),
-                      flexDirection: 'column',
-                      alignItems: 'flex-end',
-                      justifyContent: 'space-evenly',
-                    }}
-                  >
-                    <ShimmerPlaceHolder
-                      style={{
-                        width: '50%',
-                        height: heightScale(30),
-                      }}
-                      shimmerColors={[
-                        colors.secondary,
-                        '#6161617c',
-                        colors.secondary,
-                      ]}
-                    />
-                    <ShimmerPlaceHolder
-                      style={{
-                        width: '30%',
-                        height: heightScale(20),
-                      }}
-                      shimmerColors={[
-                        colors.secondary,
-                        '#6161617c',
-                        colors.secondary,
-                      ]}
-                    />
-                  </View>
-                </View>
-              );
-            }
-            return (
-              <Pressable
-                android_ripple={{
-                  borderless: false,
-                  color: colors.secondary,
-                  foreground: true,
-                }}
-                onPress={() => contentItemsPress(item)}
-                key={`key-1-${item.cond}`}
-                style={[
-                  {
-                    alignItems: 'center',
-                    backgroundColor: 'transparent',
-                    width: '90%',
-                    height: heightScale(screen.width * 0.25),
-
-                    borderRadius: sizeScale(8),
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                  },
-                ]}
-              >
-                <View
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 2,
-                    padding: sizeScale(15),
-                  }}
-                >
-                  <SimpleLineIcons
-                    name="arrow-left"
-                    color={colors.text.secondary}
-                    size={sizeScale(10)}
-                  />
-                </View>
-                <View
-                  style={[
-                    {
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      backgroundColor: 'transparent',
-                      width: '100%',
-                      height: '100%',
-                      paddingHorizontal: sizeScale(10),
-                      paddingVertical: sizeScale(10),
-                      flex: 1,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={{
-                      fontFamily: 'Cairo-Bold',
-                      color: colors.text.primary,
-                      fontSize: sizeScale(16),
-                    }}
-                  >
-                    {item?.label}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Cairo',
-
-                      color: colors.text.secondary,
-                      fontSize: sizeScale(14),
-                    }}
-                  >
-                    {item?.length} {item?.sub}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    {
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: '100%',
-                      width: widthScale(screen.width * 0.25),
-                      overflow: 'hidden',
-                      padding: 0,
-                      borderRadius: 0,
-                    },
-                  ]}
-                >
-                  {item?.img ? (
-                    <Image
-                      style={{
-                        width: '85%',
-                        height: '85%',
-                        borderRadius: sizeScale(10),
-                        resizeMode: 'cover',
-                      }}
-                      source={{ uri: item?.img }}
-                    />
-                  ) : (
-                    <ShimmerPlaceHolder
-                      style={{ width: '100%', height: '100%' }}
-                      shimmerColors={[
-                        colors.secondary,
-                        '#6161617c',
-                        colors.secondary,
-                      ]}
-                    />
-                  )}
-                </View>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <PermitCategories />
-
-        {/* <ScrollView
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingTop: sizeScale(0),
-            paddingBottom: sizeScale(10),
-            rowGap: sizeScale(10),
-          }}
-          style={{
-            flex: 1,
-            width: '95%',
-          }}
-        > */}
-
-        {/* </ScrollView> */}
-        <View
-          style={{
-            width: '85%',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexDirection: 'row-reverse',
-            columnGap: sizeScale(5),
           }}
         >
           <View
             style={{
-              flexDirection: 'row-reverse',
               alignItems: 'center',
               justifyContent: 'center',
-              columnGap: sizeScale(5),
+              backgroundColor: 'transparent',
+              flexDirection: 'column',
+              width: '100%',
+              gap: sizeScale(10),
             }}
           >
-            <MaterialCommunityIcons
-              name="youtube"
-              color={colors.text.secondary}
-              size={sizeScale(25)}
-            />
-            <Text
+            <TextInput
               style={{
-                fontFamily: 'Cairo',
-                color: colors.text.secondary,
-                fontSize: sizeScale(16),
-                textAlign: 'center',
+                width: '90%',
+                height: heightScale(50),
+                backgroundColor: colors.staticText.light.secondary,
+                borderRadius: sizeScale(8),
               }}
-            >
-              مصادر خارجية
-            </Text>
+              textAlign="center"
+              placeholder="Title"
+            />
+            <TextInput
+              style={{
+                width: '90%',
+                height: heightScale(100),
+                backgroundColor: colors.staticText.light.secondary,
+                borderRadius: sizeScale(8),
+              }}
+              aria-label="Description"
+              textAlign="center"
+              placeholder="Description"
+            />
           </View>
-        </View>
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'space-evenly',
-            flexDirection: 'row',
-            width: '90%',
-            flex: 1,
-            flexWrap: 'wrap',
-            gap: sizeScale(7),
-          }}
-        >
-          {extSources.map((item: any, index: number) => {
-            if (!firebaseLoaded) {
-              return (
-                <ShimmerPlaceHolder
-                  key={`shimmer-1-${index}`}
-                  style={{
-                    width: '100%',
-                    height: heightScale(screen.width * 0.25),
-                    borderRadius: sizeScale(8),
-                  }}
-                  shimmerColors={[
-                    colors.secondary,
-                    '#6161617c',
-                    colors.secondary,
-                  ]}
-                />
-              );
-            }
-            return (
-              <Pressable
-                android_ripple={{
-                  borderless: false,
-                  color: colors.primary,
-                  foreground: true,
-                }}
-                onPress={() => {
-                  Linking.openURL(
-                    'https://www.youtube.com/playlist?list=PLIuGUVzSi-K4754yPL6zul8QbGiK9xYNR',
-                  );
-                }}
-                key={`key-0-${index}`}
-                style={[
-                  {
-                    alignItems: 'center',
-                    backgroundColor: colors.secondary,
-                    width: '100%',
-                    height: heightScale(screen.width * 0.25),
-                    borderRadius: sizeScale(8),
-                    flexDirection: 'row-reverse',
-                    justifyContent: 'space-evenly',
-                    paddingHorizontal: sizeScale(20),
-                    paddingVertical: sizeScale(10),
-                    overflow: 'hidden',
-                    elevation: 5,
-                    columnGap: sizeScale(10),
-                  },
-                ]}
-              >
-                <Image
-                  style={{
-                    width: widthScale(screen.width * 0.35),
-                    height: '100%',
-                    borderRadius: sizeScale(10),
-                    resizeMode: 'cover',
-                  }}
-                  source={{ uri: item?.img }}
-                />
-                <View
-                  style={{
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    justifyContent: 'center',
-                    flex: 1,
-                    rowGap: sizeScale(5),
-                    zIndex: 2,
-                  }}
-                >
-                  <Text
+          <View
+            style={{
+              alignItems: 'flex-start',
+              justifyContent: 'flex-start',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              width: '90%',
+              flex: 1,
+              gap: sizeScale(10),
+            }}
+          >
+            {vehiclesList.map((item: any, index: number) => {
+              if (!firebaseLoaded) {
+                return (
+                  <ShimmerPlaceHolder
+                    key={`shimmer-${index}`}
                     style={{
-                      fontFamily: 'Cairo',
-                      color: colors.text.primary,
-                      fontSize: sizeScale(14),
-                      textAlign: 'right',
+                      backgroundColor: colors.secondary,
+                      alignItems: 'center',
+                      borderRadius: sizeScale(10),
+                      overflow: 'hidden',
+                      elevation: 5,
+                      with: widthScale(10),
+                      height: heightScale(20),
+                      columnGap: sizeScale(14),
+                    }}
+                    shimmerColors={[
+                      colors.secondary,
+                      '#6161617c',
+                      colors.secondary,
+                    ]}
+                  />
+                );
+              }
+              return (
+                <Pressable
+                  onPress={() => {
+                    vehiclesListPress(item);
+                  }}
+                  key={`key-${index}`}
+                  style={[
+                    {
+                      backgroundColor: colors.secondary,
+                      alignItems: 'center',
+                      height: heightScale(50),
+                      borderRadius: sizeScale(10),
+                      paddingHorizontal: sizeScale(0),
+                      flexDirection: 'row',
+                      justifyContent: 'space-evenly',
+                      overflow: 'hidden',
+                      gap: sizeScale(10),
+                    },
+                    index === cheked
+                      ? {
+                          borderWidth: sizeScale(1),
+                          borderColor: colors.active,
+                        }
+                      : {
+                          borderWidth: sizeScale(0),
+                          borderColor: colors.active,
+                        },
+                  ]}
+                >
+                  <View
+                    style={[
+                      {
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                      },
+                    ]}
+                  >
+                    {item.src === 'MaterialCommunityIcons' ? (
+                      <MaterialCommunityIcons
+                        name={item.icon}
+                        color={colors.text.secondary}
+                        size={sizeScale(20)}
+                      />
+                    ) : item.src === 'FontAwesome5' ? (
+                      <FontAwesome5
+                        name={item.icon}
+                        color={colors.text.secondary}
+                        size={sizeScale(16)}
+                      />
+                    ) : null}
+                  </View>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
-                    {item.label}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          })}
+                    <Text
+                      style={{
+                        fontFamily:
+                          language === 'english' ? 'sans-serif' : 'Cairo-Bold',
+                        color: colors.text.secondary,
+                        fontSize: sizeScale(18),
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {item.label}
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
       </ScrollView>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          width: '100%',
+          gap: sizeScale(10),
+          flex: 1,
+        }}
+      >
+        <Pressable
+          android_ripple={{
+            borderless: false,
+            color: colors.primary,
+            foreground: true,
+          }}
+          onPress={() => {}}
+          style={[
+            {
+              backgroundColor: colors.active,
+              alignItems: 'center',
+              width: '90%',
+              paddingHorizontal: sizeScale(15),
+              paddingVertical: sizeScale(15),
+              borderRadius: sizeScale(10),
+              flexDirection: 'row-reverse',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              columnGap: sizeScale(14),
+            },
+          ]}
+        >
+          <View
+            style={[
+              {
+                width: '25%',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name={'arrow-right'}
+              color={colors.staticText.dark.primary}
+              size={sizeScale(18)}
+            />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: language == 'english' ? 'sans-serif' : 'Cairo-Bold',
+                color: colors.staticText.dark.primary,
+                fontSize: sizeScale(18),
+                textAlign: 'right',
+                fontWeight: 'bold',
+              }}
+            >
+              Get Delivrey
+            </Text>
+          </View>
+        </Pressable>
+      </View>
     </View>
   );
 }
