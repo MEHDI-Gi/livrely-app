@@ -58,7 +58,7 @@ const AdFooter: React.FC<AdFooterProps> = React.memo(({ adLoaded, setAdLoaded })
         }).start();
     }, [adLoaded, internalLoaded, heightAnim]);
 
-    const unitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-7985985128504090/3972164821';
+    const unitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-7985985128504090/6428683646';
 
     return (
         <Animated.View

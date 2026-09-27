@@ -1,0 +1,1 @@
+/home/mid/Desktop/livrely-app/android/app/build/intermediates/cxx/Debug/322t12g2/obj/arm64-v8a
