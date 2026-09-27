@@ -1,0 +1,5 @@
+{
+    "window.density.editorTabHeight": "default",
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay"
+}
