@@ -1,12 +1,21 @@
-
-
 import { useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged, signInWithCredential, GoogleAuthProvider, signOut } from '@react-native-firebase/auth';
-import { isErrorWithCode, GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithCredential,
+  GoogleAuthProvider,
+  signOut,
+} from '@react-native-firebase/auth';
+import {
+  isErrorWithCode,
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 // Configure GoogleSignin once at app startup or component mount
 GoogleSignin.configure({
-  webClientId: '545139079478-ate37f0pbau0mhkv5r356reh1pluljv2.apps.googleusercontent.com',
+  webClientId:
+    '651133318286-oq2ph7kb7d4eub47kong3omdtadbre22.apps.googleusercontent.com',
 
   offlineAccess: true, // optionally needed for server-side verification
 });
@@ -20,13 +29,13 @@ export function useGoogleSignIn() {
 
   // ✅ FIXED: Empty deps + proper logic
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
       setUser(firebaseUser);
-      setInitializing(false);  // Always set false after FIRST fire
+      setInitializing(false); // Always set false after FIRST fire
     });
 
     return unsubscribe;
-  }, []);  // ✅ Empty deps!
+  }, []); // ✅ Empty deps!
 
   const signIn = async () => {
     if (authInProgress) {
@@ -35,7 +44,9 @@ export function useGoogleSignIn() {
     }
     setAuthInProgress(true);
     try {
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
 
       await GoogleSignin.signIn();
       const tokens = await GoogleSignin.getTokens();
@@ -48,14 +59,12 @@ export function useGoogleSignIn() {
 
       const googleCredential = GoogleAuthProvider.credential(tokens.idToken);
       await signInWithCredential(auth, googleCredential);
-
     } catch (error) {
       // existing error handling logic...
     } finally {
       setAuthInProgress(false);
     }
   };
-
 
   // Logout method
   const logout = async () => {

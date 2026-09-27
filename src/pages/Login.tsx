@@ -30,8 +30,8 @@ export default function Login({ navigation }: LoginProps) {
 
   const [isAuthProcessing, setIsAuthProcessing] = useState(false);
 
-  const title = 'رخصتي';
-  const sub = 'تعليم قوانين المرور الجزائرية'
+  const title = 'Livrely';
+  const sub = 'Delivrey App'
 
   const questCover = `${imgBase}/cover/qst.png`;
   const examsCover = `${imgBase}/cover/exm.png`;
